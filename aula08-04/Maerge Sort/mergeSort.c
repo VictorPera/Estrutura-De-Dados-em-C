@@ -1,138 +1,76 @@
-// #include <stdio.h>
-// #include <stdlib.h>
-
-// void mergesort(int *v, int n);
-// void sort(int *v, int *c, int i, int f);
-// void merge(int *v, int *c, int i, int m, int f);
-
-// int main (void) {
-//   int i;
-//   int v[8] = { -1, 7, -3, 11, 4, -2, 4, 8 };
-
-//   mergesort(v, 8);
-
-//   for (i = 0; i < 8; i++) printf("%d ", v[i]);
-
-//   putchar('\n');
-
-//   return 0;
-// }
-
-// /*
-//   Dado um vetor de inteiros v e um inteiro n >= 0, ordena o vetor v[0..n-1] em ordem crescente.
-// */
-// void mergesort(int *v, int n) {
-//   int *c = malloc(sizeof(int) * n);
-//   sort(v, c, 0, n - 1);
-//   free(c);
-// }
-
-// /*
-//   Dado um vetor de inteiros v e dois inteiros i e f, ordena o vetor v[i..f] em ordem crescente.
-//   O vetor c é utilizado internamente durante a ordenação.
-// */
-// void sort(int *v, int *c, int i, int f) {
-//   if (i >= f) return;
-
-//   int m = (i + f) / 2;
-
-//   sort(v, c, i, m);
-//   sort(v, c, m + 1, f);
-
-//   /* Se v[m] <= v[m + 1], então v[i..f] já está ordenado. */
-//   if (v[m] <= v[m + 1]) return;
-
-//   merge(v, c, i, m, f);
-// }
-
-
-// /*
-//   Dado um vetor v e três inteiros i, m e f, sendo v[i..m] e v[m+1..f] vetores ordenados,
-//   coloca os elementos destes vetores, em ordem crescente, no vetor em v[i..f].
-// */
-// void merge(int *v, int *c, int i, int m, int f) {
-//   int z,
-//       iv = i, ic = m + 1;
-
-//   for (z = i; z <= f; z++) c[z] = v[z];
-
-//   z = i;
-
-//   while (iv <= m && ic <= f) {
-//     /* Invariante: v[i..z] possui os valores de v[iv..m] e v[ic..f] em ordem crescente. */
-
-//     if (c[iv] <= c[ic]) v[z++] = c[iv++];
-//     else v[z++] = c[ic++];
-//   }
-
-//   while (iv <= m) v[z++] = c[iv++];
-
-//   while (ic <= f) v[z++] = c[ic++];
-// }
 #include <stdio.h>
 #include <stdlib.h>
 
-void mergesort(int v[], int n);
-void sort(int v[], int c[], int i, int f);
-void merge(int v[], int c[], int i, int m, int f);
-
-int main(void) {
-    int i;
-    int v[8] = { -1, 7, -3, 11, 4, -2, 4, 8 };
-
-    mergesort(v, 8);
-
-    for (i = 0; i < 8; i++) {
-        printf("%d ", v[i]);
+// Função para impressão do vetor
+void impressao(char msg[], int array[], int t) {
+    printf("%s", msg);
+    for (int i = 0; i < t; i++) {
+        printf("%d ", array[i]);
     }
+    printf("\n");
+}
 
-    putchar('\n');
+// Função para mesclar duas sub-listas ordenadas
+void merge(int array[], int esquerda, int meio, int direita) {
+int t1 = meio - esquerda + 1;
+int t2 = direita - meio;
+// Cria vetores temporários para armazenar as sub-listas
+int E[t1], D[t2];
+    // Copia os elementos para os vetores temporários
+    for (int i = 0; i < t1; i++){
+        E[i] = array[esquerda + i];
+        for (int j = 0; j < t2; j++){
+                D[j] = array[meio + 1 + j];
+
+                int i = 0, j = 0, k = esquerda;
+
+                while (i < t1 && j < t2) {
+                    if (E[i] <= D[j]) {
+                        array[k] = E[i]; // Insere o elemento de E
+                        i++;
+                    } else {
+                        array[k] = D[j]; // Insere o elemento de D
+                        j++;
+                    }
+                    k++;
+
+                    // Copia os elementos restantes de E e D, se houver
+                    while (i < t1) {
+                        array[k] = E[i];
+                        i++;
+                        k++;
+                    }
+                    while (j < t2) {
+                        array[k] = D[j];
+                        j++;
+                        k++;
+                    }
+                }
+            }
+        }
+    }  
+
+// Função Merge Sort
+void mergeSort(int array[], int esquerda, int direita) {
+    if (esquerda < direita) {
+        int meio = esquerda + (direita - esquerda) / 2;
+
+        // Chama o Merge Sort para as duas metades
+        mergeSort(array, esquerda, meio);
+        mergeSort(array, meio + 1, direita);
+
+        // Mescla as duas metades ordenadas
+        merge(array, esquerda, meio, direita);
+    }
+}
+
+int main(){
+    int array[] = {62, 35, 14, 32, 11};
+    int tamanho = sizeof(array)/sizeof(array[0]);
+
+    impressao("Vetor original: ", array, tamanho);
+    mergeSort(array, 0, tamanho - 1);
+    impressao("Vetor ordenado: ", array, tamanho);
 
     return 0;
-}
-
-void mergesort(int v[], int n) {
-    int *c = malloc(sizeof(int) * n);
-    sort(v, c, 0, n - 1);
-    free(c);
-}
-
-void sort(int v[], int c[], int i, int f) {
-    if (i >= f) return;
-
-    int m = (i + f) / 2;
-
-    sort(v, c, i, m);
-    sort(v, c, m + 1, f);
-
-    if (v[m] <= v[m + 1]) return;
-
-    merge(v, c, i, m, f);
-}
-
-void merge(int v[], int c[], int i, int m, int f) {
-    int z,
-        iv = i, ic = m + 1;
-
-    for (z = i; z <= f; z++) {
-        c[z] = v[z];
-    }
-
-    z = i;
-
-    while (iv <= m && ic <= f) {
-        if (c[iv] <= c[ic]) {
-            v[z++] = c[iv++];
-        } else {
-            v[z++] = c[ic++];
-        }
-    }
-
-    while (iv <= m) {
-        v[z++] = c[iv++];
-    }
-
-    while (ic <= f) {
-        v[z++] = c[ic++];
-    }
 }
